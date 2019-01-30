@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html" charset="utf-8"/>
+    <title>WebGL Configurator</title>
+     <link rel = "stylesheet" type = "text/css" href = "css/main.css" />
+    <!--- Link to the last version of BabylonJS --->
+    <script src="https://cdn.babylonjs.com/babylon.js"></script>
+    <style>
+
+    </style>
+</head>
+<body>
+    <canvas id="renderCanvas"></canvas>
+     <div class="rgb">
+        Red - <span id="redval">0</span><input type="range" min="0"  max="255" step="1" class="slider"id="red" value="0">
+        Green - <span id="greenval">0</span><input type="range" min="0"  max="255" step= "1" id="green" value="0">
+        Blue - <span id="blueval">0</span><input type="range" min="0"  max="255" step="1" id="blue" value="0">
+    </div>
+    <div class="buttons">
+        <button id="colors">Color Picker</button><br /><br />
+        <button id="gold">Oxidized Gold</button><br /><br />
+        <button id="leather">Leather</button><br /><br />
+        <button id="wood">Wood</button><br /><br />
+        <button id="city">Glow</button><br /><br />
+        <button id="glass">Glass</button>
+    </div>
+    <script src="js/main.js"></script>
+</body>
+</html>
