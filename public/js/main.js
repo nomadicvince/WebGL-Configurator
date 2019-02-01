@@ -28,6 +28,27 @@
                     glowPack.intensity = Math.cos(t) * 0.5 + 0.5;
                 });
 
+             
+                //RGB to Hex conversions
+                function componentFromStr(numStr, percent) {
+                    let num = Math.max(0, parseInt(numStr, 10));
+                    return percent ?
+                        Math.floor(255 * Math.min(100, num) / 100) : Math.min(255, num);
+                }
+                
+                function rgbToHex(rgb) {
+                    let rgbRegex = /^rgb\(\s*(-?\d+)(%?)\s*,\s*(-?\d+)(%?)\s*,\s*(-?\d+)(%?)\s*\)$/;
+                    let result, r, g, b, hex = "";
+                    if ( (result = rgbRegex.exec(rgb)) ) {
+                        r = componentFromStr(result[1], result[2]);
+                        g = componentFromStr(result[3], result[4]);
+                        b = componentFromStr(result[5], result[6]);
+                    
+                        hex = "#" + (0x1000000 + (r << 16) + (g << 8) + b).toString(16).slice(1);
+                    }
+                    return hex;
+                }
+
                 //Mouse event for texture pickers
                 const colors = document.getElementById('colors');
                 const gold = document.getElementById('gold');
@@ -35,7 +56,7 @@
                 const leatherFab = document.getElementById('leather');
                 const woodPan = document.getElementById('wood');
                 const cityScape = document.getElementById('city');
-                const rgb = document.querySelector('.rgb');
+                const slidercontainer = document.querySelector('.slidercontainer');
 
                 // Skybox
                 const skybox = BABYLON.Mesh.CreateBox("skyBox", 100.0, scene);
@@ -103,7 +124,7 @@
                 wood.bumpTexture = new BABYLON.Texture("textures/wood/wood_nrm.jpg", scene);
                 wood.cameraExposure = 0.30;
                 wood.cameraContrast = 0.99;
-                wood.microSurface = 1.0;
+                wood.microSurface = 0.9;
                 wood.useMicroSurfaceFromReflectivityMapAlpha = true;
                 wood.forceIrradianceInFragment = true;
 
@@ -131,35 +152,13 @@
                 glass.microSurface = 0.9;
                 glass.albedoColor = new BABYLON.Color3(0.85, 0.85, 0.85);
                                 
-                //Mouse event for color picker
+                //Variables for color sliders
                 const input = document.querySelectorAll('input');
+                const slider1 = document.querySelectorAll('.slider')[0];
+                const slider2 = document.querySelectorAll('.slider')[1];
+                const slider3 = document.querySelectorAll('.slider')[2];
 
-                //color picker 
-                for (let i = 0; i < input.length; i++) {
-                    input[i].addEventListener('input', () => {
-                        //slider values
-                        let red = document.getElementById('red').value,
-                            green = document.getElementById('green').value,
-                            blue = document.getElementById('blue').value;
-
-                            redval = document.getElementById('redval');
-                            greenval = document.getElementById('greenval');
-                            blueval = document.getElementById('blueval');
-
-                            document.body.style.background = `rgb(${red}, ${green}, ${blue})`;
-                            redval.innerHTML = `${red}`;
-                            greenval.innerHTML = `${green}`;
-                            blueval.innerHTML = `${blue}`;
-
-                        let r = parseFloat(red / 255).toFixed(3),
-                            g = parseFloat(green/  255).toFixed(3),
-                            b = parseFloat(blue / 255).toFixed(3);
-
-                        pbr.reflectivityColor = new BABYLON.Color3(r, g, b);
-                    });
-                }  
-
-             
+          
                 //event listeners
                 colors.addEventListener('click', () => {
                     const pbr = new BABYLON.PBRMaterial("pbr", scene);
@@ -177,80 +176,97 @@
                 //color picker 
                 for (let i = 0; i < input.length; i++) {
                     input[i].addEventListener('input', () => {
-                        //slider values
                         let red = document.getElementById('red').value,
-                            green = document.getElementById('green').value,
-                            blue = document.getElementById('blue').value;
+                        green = document.getElementById('green').value,
+                        blue = document.getElementById('blue').value;
+            
+                    let redval = document.getElementById('redval');
+                        greenval = document.getElementById('greenval');
+                        blueval = document.getElementById('blueval');
+            
+                        redval.innerHTML = `${red}`;
+                        greenval.innerHTML = `${green}`;
+                        blueval.innerHTML = `${blue}`;
+            
+                    let hex = document.getElementById('hex');
+                        hex.innerHTML = rgbToHex("rgb(" + red + "," + green + "," + blue + ")");
+            
+                        // rgb to vector
+                    let vector = document.getElementById('vector');
+            
+                    let r = parseFloat(red / 255).toFixed(3),
+                        g = parseFloat(green/  255).toFixed(3),
+                        b = parseFloat(blue / 255).toFixed(3);
+                        vector.innerHTML = `Red: ${r}, Green: ${g}, Blue: ${b}`
+            
+                    slider1.style.backgroundColor = `rgb(${red}, ${green}, ${blue})`;
+                    slider2.style.backgroundColor = `rgb(${red}, ${green}, ${blue})`;
+                    slider3.style.backgroundColor = `rgb(${red}, ${green}, ${blue})`;
 
-                            redval = document.getElementById('redval');
-                            greenval = document.getElementById('greenval');
-                            blueval = document.getElementById('blueval');
-
-                            document.body.style.background = `rgb(${red}, ${green}, ${blue})`;
-                            redval.innerHTML = `${red}`;
-                            greenval.innerHTML = `${green}`;
-                            blueval.innerHTML = `${blue}`;
-
-                        let r = parseFloat(red / 255).toFixed(3),
-                            g = parseFloat(green/  255).toFixed(3),
-                            b = parseFloat(blue / 255).toFixed(3);
-
-                        pbr.reflectivityColor = new BABYLON.Color3(r, g, b);
+                    pbr.reflectivityColor = new BABYLON.Color3(r, g, b);
                     });
                 }  
-
-                    rgb.style.display = "block";
+                    slidercontainer.style.display = "block";
                 });
 
                 gold.addEventListener('click', () => {
                     sphere.material = oxgold;
-                    rgb.style.display = "none";
+                    slidercontainer.style.display = "none";
                 });
 
                 leatherFab.addEventListener('click', () => {
                     sphere.material = leather;
-                    rgb.style.display = "none";
+                    slidercontainer.style.display = "none";
                 });
 
                 woodPan.addEventListener('click', () => {
                     sphere.material = wood;
-                    rgb.style.display = "none";
+                    slidercontainer.style.display = "none";
                 });
 
                 cityScape.addEventListener('click', () => {
                     sphere.material = glow;
 
                     //color picker 
-                for (let i = 0; i < input.length; i++) {
-                    input[i].addEventListener('input', () => {
-                        //slider values
-                        let red = document.getElementById('red').value,
+                    for (let i = 0; i < input.length; i++) {
+                        input[i].addEventListener('input', () => {
+                            let red = document.getElementById('red').value,
                             green = document.getElementById('green').value,
                             blue = document.getElementById('blue').value;
-
-                            redval = document.getElementById('redval');
+                
+                        let redval = document.getElementById('redval');
                             greenval = document.getElementById('greenval');
                             blueval = document.getElementById('blueval');
-
-                            document.body.style.background = `rgb(${red}, ${green}, ${blue})`;
+                
                             redval.innerHTML = `${red}`;
                             greenval.innerHTML = `${green}`;
                             blueval.innerHTML = `${blue}`;
-
+                
+                        let hex = document.getElementById('hex');
+                            hex.innerHTML = rgbToHex("rgb(" + red + "," + green + "," + blue + ")");
+                
+                            // rgb to vector
+                        let vector = document.getElementById('vector');
+                
                         let r = parseFloat(red / 255).toFixed(3),
                             g = parseFloat(green/  255).toFixed(3),
                             b = parseFloat(blue / 255).toFixed(3);
+                            vector.innerHTML = `Red: ${r}, Green: ${g}, Blue: ${b}`
+                
+                        slider1.style.backgroundColor = `rgb(${red}, ${green}, ${blue})`;
+                        slider2.style.backgroundColor = `rgb(${red}, ${green}, ${blue})`;
+                        slider3.style.backgroundColor = `rgb(${red}, ${green}, ${blue})`;
 
                         glow.emissiveColor = new BABYLON.Color3(r, g, b);
                     });
                 }  
 
-                    rgb.style.display = "block";
+                    slidercontainer.style.display = "block";
                 });
 
                 crystal.addEventListener('click', () => {
                     sphere.material = glass;
-                    rgb.style.display = "none";
+                    slidercontainer.style.display = "none";
                 });
 
                 // return the created scene
